@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sports TV</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:tahoma;
+  color:#fff;
+  overflow:hidden;
+  background:#001a33;
+}
+
+/* animated background */
+.bg{
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(circle at 15% 25%, rgba(255,255,255,.18), transparent 40%),
+    radial-gradient(circle at 85% 75%, rgba(255,255,255,.14), transparent 45%),
+    linear-gradient(135deg,#001a33,#003d66,#001a33);
+  animation:bgmove 22s linear infinite;
+  z-index:-1;
+}
+@keyframes bgmove{
+  0%{background-position:0 0,0 0,0 0}
+  100%{background-position:500px 300px,-400px -300px,0 0}
+}
+
+/* Login */
+#lockScreen{
+  position:fixed;
+  inset:0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:9999;
+}
+.lock-box{
+  background:rgba(0,0,0,.55);
+  backdrop-filter:blur(14px);
+  padding:28px;
+  width:290px;
+  border-radius:18px;
+  text-align:center;
+  box-shadow:0 0 25px rgba(0,0,0,.6);
+}
+.lock-box input{
+  width:100%;
+  height:44px;
+  border:none;
+  border-radius:12px;
+  padding:0 12px;
+  margin-top:10px;
+  outline:none;
+  background:#fff;
+}
+.lock-box button{
+  width:100%;
+  height:44px;
+  border:none;
+  border-radius:12px;
+  margin-top:12px;
+  background:#0077ff;
+  color:#fff;
+  font-weight:bold;
+  cursor:pointer;
+}
+#error{color:#ff4d4d;display:none;margin-top:10px}
+
+#content{display:none}
+
+/* Header */
+.top-header{
+  background:rgba(0,0,0,.7);
+  padding:10px 14px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border-bottom:2px solid #0077ff;
+}
+.visits{color:#00ff99;font-weight:bold}
+
+/* Menus (SCROLL FIX ONLY) */
+.channels{
+  padding:15px;
+  display:grid;
+  grid-template-columns:1fr;
+  gap:12px;
+  overflow-y:auto;
+  max-height:calc(100vh - 60px);
+  -webkit-overflow-scrolling:touch;
+}
+.channel-btn{
+  background:#1a1a1a;
+  padding:15px;
+  border-radius:14px;
+  text-align:center;
+  font-size:18px;
+  font-weight:bold;
+  cursor:pointer;
+  border:1px solid #333;
+}
+.channel-btn:hover{background:#0077ff}
+.back-top{cursor:pointer;color:#00aaff;font-weight:bold}
+
+/* Player */
+#playerBox{display:none;position:fixed;inset:0;background:#000;z-index:5000}
+iframe{width:100%;height:100%;border:none}
+.back-btn{
+  position:absolute;
+  top:10px;
+  left:10px;
+  background:#000;
+  color:#fff;
+  padding:8px 14px;
+  border-radius:10px;
+  cursor:pointer;
+  z-index:99999;
+}
+</style>
+</head>
+
+<body>
+<div class="bg"></div>
+
+<div id="lockScreen">
+  <div class="lock-box">
+    <h3>🔐 تسجيل الدخول</h3>
+    <input id="lockCode" placeholder="أدخل كود التفعيل">
+    <button onclick="unlock()">دخول</button>
+    <div id="error">الكود غير صالح</div>
+  </div>
+</div>
+
+<div id="content">
+  <div class="top-header">
+    <b>Sports TV</b>
+    <div class="visits">👤 <span id="userName">---</span> | زيارات: <span id="visitsCount">0</span></div>
+  </div>
+
+  <div class="channels" id="mainMenu">
+    <div class="channel-btn" onclick="openBein()">beIN SPORTS</div>
+    <div class="channel-btn" onclick="openPost()">POST SPORTS</div>
+  </div>
+
+  <div class="channels" id="beinMenu" style="display:none">
+    <div class="back-top" onclick="backMain()">⬅ رجوع</div>
+    <div class="channel-btn" onclick="openChannel(1)">beIN SPORTS 1</div>
+    <div class="channel-btn" onclick="openChannel(2)">beIN SPORTS 2</div>
+    <div class="channel-btn" onclick="openChannel(3)">beIN SPORTS 3</div>
+    <div class="channel-btn" onclick="openChannel(4)">beIN SPORTS 4</div>
+    <div class="channel-btn" onclick="openChannel(5)">beIN SPORTS 5</div>
+    <div class="channel-btn" onclick="openChannel(6)">beIN SPORTS 6</div>
+    <div class="channel-btn" onclick="openChannel(7)">beIN SPORTS 7</div>
+    <div class="channel-btn" onclick="openChannel(8)">beIN SPORTS 8</div>
+  </div>
+
+  <div class="channels" id="postMenu" style="display:none">
+    <div class="back-top" onclick="backMain()">⬅ رجوع</div>
+    <div class="channel-btn" onclick="openChannel(101)">POST SPORTS 1 HD</div>
+    <div class="channel-btn" onclick="openChannel(102)">POST SPORTS 2 HD</div>
+    <div class="channel-btn" onclick="openChannel(103)">POST SPORTS 3 HD</div>
+    <div class="channel-btn" onclick="openChannel(104)">POST SPORTS 4 HD</div>
+    <div class="channel-btn" onclick="openChannel(105)">POST SPORTS 5 HD</div>
+    <div class="channel-btn" onclick="openChannel(106)">POST SPORTS 6 HD</div>
+  </div>
+</div>
+
+<div id="playerBox">
+  <div class="back-btn" onclick="backFromPlayer()">⬅ رجوع</div>
+  <iframe id="playerFrame" allowfullscreen></iframe>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<script>
+firebase.initializeApp({
+  apiKey:"AIzaSyAUc2cH9gVE7RECiW19XQXjNZQxVH96sFE",
+  databaseURL:"https://zezo-59a8d-default-rtdb.firebaseio.com"
+});
+const db=firebase.database();
+
+const links={
+1:"https://mandoosports.yoo7.com/h27-html?id=aHR0cHM6Ly9tYW5kby5tb2hhbWVkYWJvbWFsZWs2MzIud29ya2Vycy5kZXYvP3VybD1odHRwOi8vaGV0MDAwLjRyb3V3YW5kYS1zaG9wLnN0b3JlL2xpdmUvOTE4NDU0NTc4MDAxL2luZGV4Lm0zdTg",
+2:"https://mandoosports.yoo7.com/h27-html?id=aHR0cHM6Ly9tYW5kb3Nwb3J0Lm1hbmRvcGMyMDE5LndvcmtlcnMuZGV2Lz91cmw9aHR0cDovL2hldDAwMC40cm91d2FuZGEtc2hvcC5zdG9yZS9saXZlLzY5ODU0MjExL2luZGV4Lm0zdTg",
+3:"https://mandoosports.yoo7.com/h27-html?id=aHR0cHM6Ly9tYW5kb3Nwb3J0Lm1hbmRvcGMyMDE5LndvcmtlcnMuZGV2Lz91cmw9aHR0cDovL2hldDAwMC40cm91d2FuZGEtc2hvcC5zdG9yZS9saXZlLzY0NTU4NzcwMC9pbmRleC5tM3U4",
+4:"https://mandoosports.yoo7.com/h27-html?id=aHR0cHM6Ly9tYW5kby5tb2hhbWVkYWJvbWFsZWs2MzIud29ya2Vycy5kZXYvP3VybD1odHRwOi8vaGV0MDAwLjRyb3V3YW5kYS1zaG9wLnN0b3JlL2xpdmUvOTc4NzQ4ODg0Ny9pbmRleC5tM3U4",
+5:"https://mandoosports.yoo7.com/h27-html?id=aHR0cHM6Ly9tYW5kb3Nwb3J0Lm1hbmRvcGMyMDE5LndvcmtlcnMuZGV2Lz91cmw9aHR0cDovL2hldDAwMC40cm91d2FuZGEtc2hvcC5zdG9yZS9saXZlLzYxMDMwMzAzMC9pbmRleC5tM3U4",
+6:"https://mandoosports.yoo7.com/h27-html?id=aHR0cHM6Ly9tYW5kb3Nwb3J0Lm1hbmRvcGMyMDE5LndvcmtlcnMuZGV2Lz91cmw9aHR0cDovL2hldDAwMC40cm91d2FuZGEtc2hvcC5zdG9yZS9saXZlLzE1MTUwMDAwMDAvaW5kZXgubTN1OA",
+7:"https://mandoosports.yoo7.com/h27-html?id=aHR0cHM6Ly9tYW5kb3Nwb3J0Lm1hbmRvcGMyMDE5LndvcmtlcnMuZGV2Lz91cmw9aHR0cDovL2hldDAwMC40cm91d2FuZGEtc2hvcC5zdG9yZS9saXZlLzMzNTIzNTEwL2luZGV4Lm0zdTg",
+8:"https://mandoosports.yoo7.com/h27-html?id=aHR0cHM6Ly9tYW5kb3Nwb3J0Lm1hbmRvcGMyMDE5LndvcmtlcnMuZGV2Lz91cmw9aHR0cDovL2hldDAwMC40cm91d2FuZGEtc2hvcC5zdG9yZS9saXZlLzk5NjI1MTAwMC9pbmRleC5tM3U4",
+101:"https://mandoosports.yoo7.com/h27-html?id=https://shoottvlives.sddhagd1.workers.dev/?url=https://mejarhosting.cfd/posttv1080p/ch01/master.m3u8",
+102:"https://mandoosports.yoo7.com/h27-html?id=https://shoottvlives.sddhagd1.workers.dev/?url=https://mejarhosting.cfd/posttv1080p/ch02/master.m3u8",
+103:"https://mandoosports.yoo7.com/h27-html?id=https://shoottvlives.sddhagd1.workers.dev/?url=https://mejarhosting.cfd/posttv1080p/ch03/master.m3u8",
+104:"https://mandoosports.yoo7.com/h27-html?id=https://shoottvlives.sddhagd1.workers.dev/?url=https://mejarhosting.cfd/posttv1080p/ch04/master.m3u8",
+105:"https://mandoosports.yoo7.com/h27-html?id=https://shoottvlives.sddhagd1.workers.dev/?url=https://mejarhosting.cfd/posttv1080p/ch05/master.m3u8",
+106:"https://mandoosports.yoo7.com/h27-html?id=https://shoottvlives.sddhagd1.workers.dev/?url=https://mejarhosting.cfd/posttv1080p/ch06/master.m3u8"
+};
+
+function unlock(){
+  const code=lockCode.value.trim();
+  if(!code) return;
+  db.ref("codes/"+code).get().then(s=>{
+    if(!s.exists()||!s.val().active||s.val().visits<=0){
+      error.style.display="block";return;
+    }
+    const data=s.val();
+    const newVisits=data.visits-1;
+    db.ref("codes/"+code+"/visits").set(newVisits);
+    userName.innerText=data.name;
+    visitsCount.innerText=newVisits;
+    lockScreen.style.display="none";
+    content.style.display="block";
+  });
+}
+
+function openBein(){mainMenu.style.display="none";beinMenu.style.display="grid";}
+function openPost(){mainMenu.style.display="none";postMenu.style.display="grid";}
+function backMain(){beinMenu.style.display="none";postMenu.style.display="none";mainMenu.style.display="grid";}
+function openChannel(n){content.style.display="none";playerBox.style.display="block";playerFrame.src=links[n];}
+function backFromPlayer(){playerFrame.src="";playerBox.style.display="none";content.style.display="block";}
+</script>
+
+</body>
+</html>
